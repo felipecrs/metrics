@@ -49,7 +49,7 @@ jobs:
       - name: Run tests
         env:
           GIT_REF: ${{ github.head_ref || 'master' }}
-        run: docker run --rm --entrypoint="" lowlighter/metrics:$(echo $GIT_REF | sed 's/[^a-z]/-/g') npm run test-metrics
+        run: docker run --rm --entrypoint="" lowlighter/metrics:$(echo $GIT_REF | sed 's/[^a-z]/-/g') sh -xc 'npm install --no-save && exec npm run test-metrics'
 
   # Run CodeQL on branch
   analyze:
