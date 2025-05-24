@@ -48,21 +48,23 @@ jobs:
     steps:
     - name: check-spelling
       id: spelling
-      uses: check-spelling/check-spelling@v0.0.20
+      uses: check-spelling/check-spelling@v0.0.25
       with:
         experimental_apply_changes_via_bot: ${{ github.repository_owner != 'lowlighter' && 1 || 0 }}
         suppress_push_for_open_pull_request: 1
         checkout: true
         post_comment: 0
-        extra_dictionaries:
-          cspell:html/html.txt
-          cspell:filetypes/filetypes.txt
-          cspell:css/css.txt
-          cspell:fullstack/fullstack.txt
-          cspell:django/django.txt
-          cspell:npm/npm.txt
-          cspell:aws/aws.txt
-        check_extra_dictionaries: ''
+        # To fix spelling later:
+        # https://github.com/check-spelling/check-spelling/releases/tag/v0.0.22
+        # extra_dictionaries:
+        #   cspell:html/html.txt
+        #   cspell:filetypes/filetypes.txt
+        #   cspell:css/css.txt
+        #   cspell:fullstack/fullstack.txt
+        #   cspell:django/django.txt
+        #   cspell:npm/npm.txt
+        #   cspell:aws/aws.tx
+        # check_extra_dictionaries: ''
 
   comment:
     name: Report
@@ -74,7 +76,7 @@ jobs:
     if: (success() || failure()) && needs.spelling.outputs.followup
     steps:
     - name: comment
-      uses: check-spelling/check-spelling@v0.0.20
+      uses: check-spelling/check-spelling@v0.0.25
       with:
         checkout: true
         task: ${{ needs.spelling.outputs.followup }}
@@ -97,7 +99,7 @@ jobs:
       cancel-in-progress: false
     steps:
     - name: apply spelling updates
-      uses: check-spelling/check-spelling@v0.0.20
+      uses: check-spelling/check-spelling@v0.0.25
       with:
         experimental_apply_changes_via_bot: ${{ github.repository_owner != 'lowlighter' && 1 || 0 }}
         checkout: true
