@@ -54,7 +54,7 @@ jobs:
       - name: Screenshot markdown example
         if: ${{ success() || failure() }}
         run: |
-          docker run --rm --entrypoint="" --volume=/tmp:/tmp ghcr.io/lowlighter/metrics:master node /metrics/.github/scripts/markdown_example.mjs
+          docker run --rm --entrypoint="" --volume=/tmp:/tmp ghcr.io/felipecrs/metrics:master node /metrics/.github/scripts/markdown_example.mjs
           sudo mv /tmp/metrics.markdown.png /metrics_renders/
       - name: Publish examples
         if: ${{ success() || failure() }}
@@ -88,7 +88,7 @@ jobs:
 
       - name: Contributors
         if: ${{ success() || failure() }}
-        uses: lowlighter/metrics@master
+        uses: felipecrs/metrics@master
         with:
           filename: metrics.contributors.svg
           token: ${{ secrets.METRICS_TOKEN }}
@@ -104,7 +104,7 @@ jobs:
           delay: 120
       - name: Sponsors
         if: ${{ success() || failure() }}
-        uses: lowlighter/metrics@master
+        uses: felipecrs/metrics@master
         with:
           filename: metrics.sponsors.svg
           token: ${{ secrets.METRICS_TOKEN_PERSONAL }}
@@ -120,7 +120,7 @@ jobs:
           delay: 120
       - name: Licenses
         if: ${{ success() || failure() }}
-        uses: lowlighter/metrics@master
+        uses: felipecrs/metrics@master
         with:
           filename: metrics.licenses.svg
           token: ${{ secrets.METRICS_TOKEN }}
