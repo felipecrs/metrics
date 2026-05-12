@@ -12,19 +12,24 @@ export default async function({login, imports, data, rest, q, account}, {enabled
 
     //Repositories
     const repositories = data.user.repositories.nodes.map(({name: repo, owner: {login: owner}}) => ({repo, owner})) ?? []
+    console.debug(`metrics/compute/${login}/plugins > traffic > ${repositories.length} repositories available`)
 
     //Get views stats from repositories
     console.debug(`metrics/compute/${login}/plugins > traffic > querying api`)
     const views = {count: 0, uniques: 0}
     const promised = [...await Promise.allSettled(repositories.map(({repo, owner}) => imports.filters.repo(`${owner}/${repo}`, skipped) ? rest.repos.getViews({owner, repo}) : {}))]
     const response = promised.filter(({status}) => status === "fulfilled").map(({value}) => value)
+    const skippedCount = promised.length - response.filter(({data}) => data !== undefined).length
+    console.debug(`metrics/compute/${login}/plugins > traffic > ${response.length} fulfilled, ${promised.filter(({status}) => status === "rejected").length} rejected, ${skippedCount} skipped`)
 
     //Handle error if all promises were rejected
     const rejected = promised.filter(({status}) => status === "rejected")
-    if (rejected.length === promised.length) {
-      if (promised.map(({reason}) => reason.message).every(error => /must have push access to repository/i.test(error)))
-        throw {error: {message: "Insufficient token scopes"}}
-      throw new Error(promised[0].reason.message)
+    if (rejected.length > 0 && rejected.length === promised.length) {
+      const reasons = rejected.map(({reason}) => reason.message)
+      console.debug(`metrics/compute/${login}/plugins > traffic > all requests failed: ${reasons.join(", ")}`)
+      if (reasons.every(error => /must have push access to repository/i.test(error)))
+        throw {error: {message: "Insufficient token scopes", instance: rejected[0].reason}}
+      throw new Error(rejected[0].reason.message)
     }
     else if (rejected.length) {
       rejected.map(({reason}) => console.debug(`metrics/compute/${login}/plugins > traffic > warn > ${reason.message}`))
